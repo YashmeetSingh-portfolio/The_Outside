@@ -8,7 +8,7 @@ function AskDoubtPage() {
     const [latestAnswer, setLatestAnswer] = useState(null);
     const [previousQA, setPreviousQA] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!question.trim()) return;
@@ -17,7 +17,7 @@ function AskDoubtPage() {
         setLatestAnswer(null); // clear previous live answer
 
         try {
-            const res = await fetch("http://localhost:5000/ask", {
+            const res = await fetch(`${backendUrl}/ask`, {  
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -15,38 +15,49 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Existing /ask endpoint
 app.post('/ask', async (req, res) => {
-    const { question } = req.body;
+  const { question } = req.body;
 
-    try {
-        const aiResponse = await axios.post(
-            'https://openrouter.ai/api/v1/chat/completions',
-            {
-                model: 'openai/gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are a helpful AI that answers only space-related questions. First, check if the user's question is clearly related to astronomy, astrophysics, planets, stars, galaxies, space missions, black holes, or the universe. If it's not, reply briefly: "Sorry, this question doesn't seem to be space-related. Please ask something about space." Otherwise, answer concisely but informatively.`
-                    },
-                    { role: 'user', content: question }
-                ]
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+  // 1. Define headers (OpenRouter-specific)
+  const headers = {
+    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+    'HTTP-Referer': 'http://localhost:5000', // REQUIRED
+    'X-Title': 'Space Explorer', // Optional
+    'Content-Type': 'application/json'
+  };
 
-        const answer = aiResponse.data.choices[0].message.content;
-        res.json({ answer });
+  // 2. Debug output
+  console.log("Headers:", headers);
 
-    } catch (error) {
-        console.error('AI Error (ask endpoint):', error.response?.data || error.message);
-        res.status(500).json({ answer: 'Failed to get a response from the AI model.' });
-    }
+  try {
+    // 3. Send request
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'openai/gpt-3.5-turbo',
+        messages: [{ role: 'user', content: question }]
+      },
+      { headers }
+    );
+
+    // 4. Extract response
+    const answer = response.data.choices[0].message.content;
+    res.json({ answer });
+
+  } catch (error) {
+    // 5. Detailed error logging
+    console.error("Full Error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      config: error.config?.headers 
+    });
+
+    res.status(500).json({
+      error: "OpenRouter request failed",
+      details: error.response?.data || error.message
+    });
+  }
 });
-
 // Existing /fact endpoint
 app.post('/fact', async (req, res) => {
     try {

@@ -7,12 +7,13 @@ function AISpaceFacts() {
     const [factHistory, setFactHistory] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
 
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     // Function to get a new AI-generated fact from the backend
    const generateFact = async () => {
     setIsGenerating(true);
 
     try {
-        const res = await fetch("http://localhost:5000/fact", {
+        const res = await fetch(`${backendUrl}/fact`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
