@@ -1,0 +1,67 @@
+/* Fullscreen container with space theme */
+.explore-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(to bottom right, #000000, #1b0034, #000c2c);
+    overflow: hidden;
+}
+
+/* Optional gradient overlay */
+.explore-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: 0;
+}
+
+/* Title styling */
+.explore-title {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.75rem;
+    color: white;
+    font-weight: 600;
+    z-index: 10;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    letter-spacing: 2px;
+}
+
+/* NASA iframe */
+.explore-iframe {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Loading spinner */
+.explore-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+.loader-circle {
+    border: 5px solid transparent;
+    border-top: 5px solid #a855f7;
+    border-bottom: 5px solid #7c3aed;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

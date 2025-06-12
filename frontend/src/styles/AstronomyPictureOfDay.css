@@ -1,0 +1,222 @@
+/* Import space-themed fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+/* Base styles and cosmic background */
+.apod-container {
+    position: relative;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0c0118, #1a0b2e, #0c0118);
+    font-family: 'Rajdhani', sans-serif;
+    color: #e0e6ff;
+    padding: 2rem 1rem;
+}
+
+/* Stars background effect */
+.stars-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.stars-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 4px),
+        radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 3px),
+        radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 4px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    animation: twinkle 8s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    0% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Main content container */
+.apod-content {
+    position: relative;
+    z-index: 1;
+    height: 35%;
+    width: 40%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Main title styling */
+.apod-main-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: linear-gradient(to right, #ffffff, #a2c0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 15px rgba(162, 192, 255, 0.3);
+    letter-spacing: 2px;
+}
+
+/* Holographic frame styling */
+.apod-frame {
+    width: 100%;
+    background: rgba(16, 20, 45, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 
+        0 0 30px rgba(0, 140, 255, 0.15),
+        0 0 5px rgba(0, 140, 255, 0.1),
+        inset 0 0 10px rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.apod-frame:hover {
+    box-shadow: 
+        0 0 40px rgba(0, 140, 255, 0.25),
+        0 0 10px rgba(0, 140, 255, 0.15),
+        inset 0 0 15px rgba(0, 140, 255, 0.1);
+}
+
+/* Frame header styling */
+.frame-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(10, 15, 30, 0.8);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.2);
+}
+
+.frame-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00e676;
+    box-shadow: 0 0 10px #00e676;
+    margin-right: 1rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 230, 118, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+    }
+}
+
+.frame-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #a2c0ff;
+}
+
+/* Image container styling */
+.image-container {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+.apod-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.image-container:hover .apod-image {
+    transform: scale(1.02);
+}
+
+/* Info section styling */
+.apod-info {
+    padding: 1.5rem 2rem 2rem;
+}
+
+.apod-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(162, 192, 255, 0.3);
+}
+
+.apod-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #c8d3ff;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .apod-main-title {
+        font-size: 1.8rem;
+    }
+    
+    .apod-title {
+        font-size: 1.3rem;
+    }
+    
+    .apod-description {
+        font-size: 1rem;
+    }
+    
+    .apod-info {
+        padding: 1.2rem 1.5rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .apod-main-title {
+        font-size: 1.5rem;
+    }
+    
+    .frame-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .frame-title {
+        font-size: 0.8rem;
+    }
+    
+    .apod-title {
+        font-size: 1.1rem;
+    }
+    
+    .apod-info {
+        padding: 1rem;
+    }
+}

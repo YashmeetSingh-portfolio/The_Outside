@@ -1,0 +1,174 @@
+.iss-container {
+    display: flex;
+    height: 100vh;
+    background: black;
+    color: #ffffff;
+    overflow: hidden;
+    position: relative;
+}
+
+.iss-map {
+    flex: 1;
+    height: 100%;
+    position: relative;
+}
+
+.iss-info-panel {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 380px;
+    background: rgba(13, 17, 23, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+/* Mobile Info Panel Toggle Button */
+.mobile-panel-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(126, 178, 255, 0.2);
+    border: 1px solid rgba(126, 178, 255, 0.3);
+    color: #7EB2FF;
+    font-size: 24px;
+    z-index: 1001;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .iss-info-panel {
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .iss-info-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-height: 60vh;
+        transform: translateY(0);
+        border-radius: 15px 15px 0 0;
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .iss-info-panel.minimized {
+        transform: translateY(calc(100% - 40px));
+    }
+
+    .mobile-panel-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .iss-info-panel h2 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .iss-info-panel h3 {
+        font-size: 1.2rem;
+    }
+
+    .iss-description {
+        font-size: 0.9rem;
+        margin: 15px 0;
+        padding: 12px;
+    }
+
+    .iss-info-panel li {
+        padding: 8px;
+        margin: 8px 0;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .iss-info-panel {
+        padding: 15px;
+    }
+
+    .iss-data-value {
+        font-size: 0.9rem;
+    }
+}
+
+/* Panel Handle for Mobile */
+.panel-handle {
+    display: none;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    margin: 0 auto 15px;
+}
+
+@media (max-width: 768px) {
+    .panel-handle {
+        display: block;
+    }
+}
+
+/* Animation and Interactive Elements */
+.iss-data-value {
+    font-family: 'Space Mono', monospace;
+    color: #00ff9d;
+    text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+    transition: all 0.3s ease;
+}
+
+.data-update {
+    animation: dataUpdate 0.5s ease;
+}
+
+@keyframes dataUpdate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Scrollbar Styles */
+.iss-info-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.iss-info-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.iss-info-panel::-webkit-scrollbar-thumb {
+    background: rgba(126, 178, 255, 0.5);
+    border-radius: 3px;
+}
+
+.iss-info-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(126, 178, 255, 0.7);
+}
