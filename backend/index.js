@@ -86,8 +86,13 @@ app.post('/quiz', async (req, res) => {
     const { theme, difficulty } = req.body;
     const numberOfQuestions = 5; // You can make this configurable if needed
 
+    let promptTheme = theme;
+    if (theme === 'random') {
+        promptTheme = "a random fascinating space-related topic"; // Instruct AI to pick a random theme
+    }
+
     try {
-        const prompt = `Generate a ${numberOfQuestions} question multiple-choice quiz about ${theme} with ${difficulty} difficulty. Each question should have exactly 4 options. Provide the correct answer.`;
+        const prompt = `Generate a ${numberOfQuestions} question multiple-choice quiz about ${promptTheme} with ${difficulty} difficulty. Each question should have exactly 4 options. Provide the correct answer.`;
         const systemInstruction = `You are an expert quiz master specializing in space and astronomy. Your task is to generate multiple-choice questions in JSON format. Ensure all questions are unique, accurate, and the options are distinct and plausible. Always provide exactly 4 options per question.
 
         The JSON response MUST be a single object with a 'questions' key, which is an array of question objects. Each question object MUST have the following keys:
@@ -125,7 +130,6 @@ app.post('/quiz', async (req, res) => {
                         content: prompt
                     }
                 ],
-                // Just specify that we expect a JSON object, without a detailed schema here
                 response_format: {
                     type: "json_object"
                 }
@@ -140,7 +144,6 @@ app.post('/quiz', async (req, res) => {
 
         const responseContent = aiResponse.data.choices[0].message.content;
 
-        // Robust parsing with try-catch in case AI deviates from expected JSON
         let parsedData;
         try {
             parsedData = JSON.parse(responseContent);
@@ -150,15 +153,13 @@ app.post('/quiz', async (req, res) => {
             return res.status(500).json({ error: "AI returned malformed JSON. Please try again." });
         }
 
-        // Validate the structure of the parsed data
         if (parsedData && parsedData.questions && Array.isArray(parsedData.questions) && parsedData.questions.length > 0) {
-            // Further optional validation of each question object (e.g., presence of keys)
             const isValid = parsedData.questions.every(q =>
                 typeof q.question === 'string' &&
                 Array.isArray(q.options) && q.options.length === 4 &&
                 q.options.every(opt => typeof opt === 'string') &&
                 typeof q.correctAnswer === 'string' &&
-                q.options.includes(q.correctAnswer) // Ensure correct answer is one of the options
+                q.options.includes(q.correctAnswer)
             );
 
             if (isValid) {
@@ -174,7 +175,6 @@ app.post('/quiz', async (req, res) => {
 
     } catch (error) {
         console.error('AI Quiz Error (quiz endpoint):', error.response?.data || error.message);
-        // Provide more detailed error info if available
         if (error.response && error.response.data && error.response.data.error) {
             res.status(500).json({ error: `Failed to generate quiz questions: ${error.response.data.error.message}` });
         } else {

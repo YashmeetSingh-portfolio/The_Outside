@@ -241,9 +241,15 @@
     color: #eef5ff;
 }
 
-/* Start Button */
-.start-button {
-    position: relative;
+/* Common Button Styles (Applies to all major action buttons) */
+.start-button,
+.next-button,
+.restart-button,
+.view-history-button, /* Added this to the list for correct positioning */
+.view-summary-button,
+.back-button,
+.replay-button {
+    position: relative; /* CRITICAL: For containing the .button-glow */
     padding: 15px 40px;
     background: linear-gradient(45deg, #0a2463, #1e3a8a);
     border: none;
@@ -253,21 +259,39 @@
     font-weight: 600;
     letter-spacing: 1px;
     cursor: pointer;
-    overflow: hidden;
+    overflow: hidden; /* CRITICAL: To hide overflowing .button-glow */
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 1;
-    margin-top: 10px;
     align-self: center;
+    margin-top: 10px; /* Adjust as needed */
 }
 
-.start-button:hover {
+/* Specific overrides for buttons if needed, e.g., font size for next/restart */
+.next-button, .restart-button, .view-history-button, .view-summary-button, .back-button, .replay-button {
+    font-size: 1.1rem; /* Slightly smaller for consistency */
+}
+
+
+.start-button:hover,
+.next-button:hover,
+.restart-button:hover,
+.view-history-button:hover, /* Added hover state for consistency */
+.view-summary-button:hover,
+.back-button:hover,
+.replay-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4),
     0 0 20px rgba(0, 191, 255, 0.4);
 }
 
-.start-button:active {
+.start-button:active,
+.next-button:active,
+.restart-button:active,
+.view-history-button:active, /* Added active state for consistency */
+.view-summary-button:active,
+.back-button:active,
+.replay-button:active {
     transform: translateY(1px);
 }
 
@@ -286,9 +310,16 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 1;
+    pointer-events: none; /* CRITICAL: Prevents the glow from capturing mouse events */
 }
 
-.start-button:hover .button-glow {
+.start-button:hover .button-glow,
+.next-button:hover .button-glow,
+.restart-button:hover .button-glow,
+.view-history-button:hover .button-glow, /* Ensure glow works on history button hover */
+.view-summary-button:hover .button-glow,
+.back-button:hover .button-glow,
+.replay-button:hover .button-glow {
     opacity: 0.3;
     animation: pulse 2s infinite;
 }
@@ -387,35 +418,7 @@
     transform: translateY(-2px);
 }
 
-/* Next Button */
-.next-button {
-    position: relative;
-    padding: 15px 40px;
-    background: linear-gradient(45deg, #0a2463, #1e3a8a);
-    border: none;
-    border-radius: 50px;
-    color: #ffffff;
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1;
-    align-self: center;
-}
-
-.next-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(0, 191, 255, 0.4);
-}
-
-.next-button:active {
-    transform: translateY(1px);
-}
-
+/* Next Button (already covered by common styles above, keeping for explicit reference) */
 .next-button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -423,7 +426,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Results Panel */
+/* Results Panel (already covered by common styles above, keeping for explicit reference) */
 .results-panel {
     width: 100%;
     max-width: 800px;
@@ -478,34 +481,200 @@
     color: #eef5ff;
 }
 
-.restart-button {
-    position: relative;
-    padding: 15px 40px;
-    background: linear-gradient(45deg, #0a2463, #1e3a8a);
-    border: none;
-    border-radius: 50px;
+/* Quiz History Panel (currently commented out in JS, but styles for future use) */
+.quiz-history-panel {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(13, 17, 23, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.2),
+    0 0 60px rgba(0, 191, 255, 0.1),
+    inset 0 0 15px rgba(0, 191, 255, 0.1);
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    text-align: center;
+}
+
+.quiz-history-panel h2 {
+    font-size: 2rem;
     color: #ffffff;
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.quiz-history-list {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.quiz-history-card {
+    background: rgba(8, 15, 30, 0.8);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+    cursor: pointer; /* Makes the whole card clickable */
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1;
-    align-self: center;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.1);
+    display: flex; /* For flexbox arrangement */
+    flex-direction: column;
+    gap: 8px;
+    justify-content: space-between; /* Pushes content and button apart */
+}
+
+.quiz-history-card:hover {
+    border-color: rgba(0, 191, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+    transform: translateY(-3px);
+}
+
+.quiz-history-card h3 {
+    font-size: 1.3rem;
+    color: #00bfff;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.quiz-history-card p {
+    font-size: 1rem;
+    color: #eef5ff;
+    margin: 0;
+}
+
+.quiz-history-card .status {
+    font-weight: bold;
     margin-top: 10px;
 }
 
-.restart-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(0, 191, 255, 0.4);
+.quiz-history-card .status.perfect {
+    color: #00ff00; /* Bright green */
 }
 
-.restart-button:active {
-    transform: translateY(1px);
+.quiz-history-card .status.great {
+    color: #00bfff; /* Sky blue */
 }
+
+.quiz-history-card .status.good {
+    color: #ffd700; /* Gold */
+}
+
+/* Specific button in history card (if enabled in JS) */
+.quiz-history-card .view-summary-btn {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 15px; /* Space between content and button */
+    align-self: flex-end; /* Align button to the right within the card */
+    transition: background-color 0.3s ease;
+}
+
+.quiz-history-card .view-summary-btn:hover {
+    background-color: #45a049;
+}
+
+/* Quiz Summary Panel */
+.quiz-summary-panel {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(13, 17, 23, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.2),
+    0 0 60px rgba(0, 191, 255, 0.1),
+    inset 0 0 15px rgba(0, 191, 255, 0.1);
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+
+.quiz-summary-panel h2 {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.summary-date {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    margin-bottom: 15px;
+}
+
+.summary-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00bfff;
+    margin-bottom: 25px;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+.summary-question-item {
+    background: rgba(8, 15, 30, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.1);
+    border: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+.summary-question-item.correct {
+    border-color: rgba(0, 255, 0, 0.5);
+    background: rgba(10, 30, 10, 0.7);
+}
+
+.summary-question-item.wrong {
+    border-color: rgba(255, 0, 0, 0.5);
+    background: rgba(30, 10, 10, 0.7);
+}
+
+.summary-question-text {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.summary-your-answer, .summary-correct-answer {
+    font-size: 0.95rem;
+    color: #eef5ff;
+}
+
+.summary-your-answer .correct-answer {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.summary-your-answer .wrong-answer {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.summary-correct-answer span {
+    color: #00bfff;
+    font-weight: bold;
+}
+
+.summary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
 
 /* Animations */
 @keyframes pulse {
@@ -543,7 +712,7 @@
         margin-bottom: 1.5rem;
     }
 
-    .settings-panel, .question-card, .results-panel {
+    .settings-panel, .question-card, .results-panel, .quiz-history-panel, .quiz-summary-panel {
         padding: 20px;
     }
 
@@ -566,7 +735,7 @@
         align-self: flex-start;
     }
 
-    .start-button, .next-button, .restart-button {
+    .start-button, .next-button, .restart-button, .view-history-button, .view-summary-button, .back-button, .replay-button {
         padding: 12px 30px;
         font-size: 1rem;
     }
@@ -587,6 +756,22 @@
     .results-message {
         font-size: 1.1rem;
     }
+
+    .quiz-history-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .quiz-history-card p {
+        font-size: 0.9rem;
+    }
+
+    .summary-question-text {
+        font-size: 1rem;
+    }
+
+    .summary-your-answer, .summary-correct-answer {
+        font-size: 0.85rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -598,7 +783,7 @@
         font-size: 1.7rem;
     }
 
-    .settings-panel, .question-card, .results-panel {
+    .settings-panel, .question-card, .results-panel, .quiz-history-panel, .quiz-summary-panel {
         padding: 15px;
     }
 
@@ -611,7 +796,7 @@
         font-size: 0.9rem;
     }
 
-    .start-button, .next-button, .restart-button {
+    .start-button, .next-button, .restart-button, .view-history-button, .view-summary-button, .back-button, .replay-button {
         padding: 10px 25px;
         font-size: 0.9rem;
     }

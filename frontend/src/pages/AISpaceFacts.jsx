@@ -1,39 +1,45 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import '../styles/AISpaceFacts.css';
 import Navbar from '../components/Navbar';
 
 function AISpaceFacts() {
-    const [currentFact, setCurrentFact] = useState("The universe is approximately 13.8 billion years old, based on measurements of cosmic microwave background radiation.");
+    const [currentFact, setCurrentFact] = useState("Click the button to get an AI-generated space fact!");
     const [factHistory, setFactHistory] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
 
-    // Function to simulate generating a new fact
-    const generateFact = () => {
-        setIsGenerating(true);
+    // Function to get a new AI-generated fact from the backend
+   const generateFact = async () => {
+    setIsGenerating(true);
 
-        // Simulate API call delay
-        setTimeout(() => {
-            const facts = [
-                "Saturn's rings are mostly made of ice particles, with a small amount of rocky debris and dust.",
-                "A day on Venus is longer than a year on Venus. Venus takes 243 Earth days to rotate once on its axis but only 225 Earth days to orbit the Sun.",
-                "The largest volcano in our solar system is Olympus Mons on Mars, standing nearly 22 km high and 600 km across.",
-                "There are more stars in the universe than grains of sand on all the beaches on Earth.",
-                "The Milky Way galaxy is on a collision course with the Andromeda galaxy. They will merge in about 4.5 billion years.",
-                "Neutron stars are so dense that a teaspoon of neutron star material would weigh about 4 billion tons.",
-                "The Great Red Spot on Jupiter is a storm that has been raging for at least 400 years.",
-                "Light from the Sun takes about 8 minutes and 20 seconds to reach Earth."
-            ];
+    try {
+        const res = await fetch("http://localhost:5000/fact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-            const newFact = facts[Math.floor(Math.random() * facts.length)];
+        const data = await res.json();
+        const newFact = data.fact || "Unable to fetch a space fact at this moment.";
+
+        // Only store the current fact if it's not the initial placeholder
+        if (currentFact !== "Click the button to get an AI-generated space fact!") {
             setFactHistory(prev => [currentFact, ...prev].slice(0, 10));
-            setCurrentFact(newFact);
-            setIsGenerating(false);
-        }, 1500);
+        }
+
+        setCurrentFact(newFact);
+    } catch (err) {
+        console.error("Error fetching space fact:", err);
+        setCurrentFact("There was an error generating a new fact. Please try again.");
+    } finally {
+        setIsGenerating(false);
+    }
     };
+
 
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <div className="space-facts-container">
                 <div className="stars-background"></div>
                 <div className="nebula-effect"></div>
@@ -51,7 +57,9 @@ function AISpaceFacts() {
                             onClick={generateFact}
                             disabled={isGenerating}
                         >
-                            <span className="button-text">Generate Fact</span>
+                            <span className="button-text">
+                                {isGenerating ? "Generating..." : "Generate Fact"}
+                            </span>
                             <div className="button-glow"></div>
                         </button>
                     </div>

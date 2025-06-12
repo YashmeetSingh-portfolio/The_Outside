@@ -36,18 +36,18 @@
 }
 
 .stars {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3' viewBox='0 0 3 3'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='white' opacity='0.8'/%3E%3C/svg%3E") repeat;
-    animation: animateStars 100s linear infinite;
+background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1' viewBox='0 0 1 1'%3E%3Ccircle cx='0.5' cy='0.5' r='0.25' fill='white' opacity='0.4'/%3E%3C/svg%3E") repeat;
+    animation: animateStars 40s linear infinite;
 }
 
 .stars2 {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' viewBox='0 0 2 2'%3E%3Ccircle cx='1' cy='1' r='0.5' fill='white' opacity='0.6'/%3E%3C/svg%3E") repeat;
-    animation: animateStars 150s linear infinite;
+    animation: animateStars 55s linear infinite;
 }
 
 .stars3 {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1' viewBox='0 0 1 1'%3E%3Ccircle cx='0.5' cy='0.5' r='0.25' fill='white' opacity='0.4'/%3E%3C/svg%3E") repeat;
-    animation: animateStars 200s linear infinite;
+    animation: animateStars 62s linear infinite;
 }
 
 @keyframes animateStars {
