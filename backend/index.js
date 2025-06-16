@@ -204,10 +204,16 @@ app.post('/quiz', async (req, res) => {
     }
 });
 
+
+
+// This for server keeping.
+const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+
+
 // Start server with port retry logic
 function startServer(port) {
     app.listen(port, () => {
-        console.log(`Server running on http://localhost:${port}`);
+        console.log(`Server running on ${SELF_URL}`);
         console.log('Available endpoints:');
         console.log(`- POST /ask (Question answering)`);
         console.log(`- POST /fact (Get space facts)`);
@@ -223,3 +229,15 @@ function startServer(port) {
 }
 
 startServer(PORT);
+
+
+
+
+
+
+// This for server keeping.
+setInterval(() => {
+    https.get(SELF_URL, (res) => {
+        console.log("Self-ping successful");
+    });
+}, 1000 * 60 * 4); // Every 4 minutes
