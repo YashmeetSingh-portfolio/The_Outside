@@ -1,5 +1,3 @@
-
-/* Base styles */
 .footer {
     position: relative;
     width: 100%;
@@ -8,7 +6,6 @@
     overflow: hidden;
 }
 
-/* Space background with stars */
 .stars-background {
     position: absolute;
     top: 0;
@@ -19,7 +16,6 @@
     z-index: -2;
 }
 
-/* Stars animation */
 .stars-background::before {
     content: '';
     position: absolute;
@@ -45,7 +41,6 @@
     }
 }
 
-/* Footer container */
 .footer-container {
     display: flex;
     justify-content: space-between;
@@ -60,7 +55,6 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Logo and brand section */
 .footer-logo {
     display: flex;
     align-items: center;
@@ -94,7 +88,6 @@
     text-shadow: 0 0 10px rgba(136, 200, 255, 0.3);
 }
 
-/* Navigation links */
 .footer-links {
     margin-bottom: 1.5rem;
 }
@@ -147,7 +140,6 @@
     box-shadow: 0 0 8px rgba(136, 200, 255, 0.8);
 }
 
-/* Social media links */
 .social-links {
     margin-bottom: 1.5rem;
 }
@@ -186,7 +178,6 @@
     box-shadow: 0 0 15px rgba(136, 200, 255, 0.5);
 }
 
-/* Copyright section */
 .copyright {
     text-align: center;
     padding: 1.5rem;
@@ -198,7 +189,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Responsive design */
+
 @media (max-width: 768px) {
     .footer-container {
         flex-direction: column;

@@ -2,198 +2,224 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+let PORT = 5000; // Let's make PORT mutable so we can try other ports
 
-app.use(cors()); // Enable CORS for all origins
-app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(cors());
+app.use(bodyParser.json());
 
-// Replace with your OpenRouter API key
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+// Get API key from environment variables
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Existing /ask endpoint
-app.post('/ask', async (req, res) => {
-  const { question } = req.body;
+if (!GEMINI_API_KEY) {
+    console.error('ERROR: GEMINI_API_KEY is missing in .env file');
+    process.exit(1);
+}
 
-  // 1. Define headers (OpenRouter-specific)
-  const headers = {
-    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-    'HTTP-Referer': 'http://localhost:5000', // REQUIRED
-    'X-Title': 'Space Explorer', // Optional
+// Base URL for Gemini API
+const GEMINI_BASE_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+// Common headers for Gemini API (Content-Type is usually sufficient as key is in URL)
+const geminiHeaders = {
     'Content-Type': 'application/json'
-  };
+};
 
-  // 2. Debug output
-  console.log("Headers:", headers);
+// 1. Question Answering Endpoint
+app.post('/ask', async (req, res) => {
+    const { question } = req.body;
 
-  try {
-    // 3. Send request
-    const response = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        model: 'openai/gpt-3.5-turbo',
-        messages: [{ role: 'user', content: question }]
-      },
-      { headers }
-    );
-
-    // 4. Extract response
-    const answer = response.data.choices[0].message.content;
-    res.json({ answer });
-
-  } catch (error) {
-    // 5. Detailed error logging
-    console.error("Full Error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      config: error.config?.headers 
-    });
-
-    res.status(500).json({
-      error: "OpenRouter request failed",
-      details: error.response?.data || error.message
-    });
-  }
-});
-// Existing /fact endpoint
-app.post('/fact', async (req, res) => {
-    try {
-        const aiResponse = await axios.post(
-            'https://openrouter.ai/api/v1/chat/completions',
-            {
-                model: 'openai/gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are a helpful AI that shares short but fascinating space-related facts. Each fact should be scientifically accurate, concise (1-2 sentences), and unique.`
-                    },
-                    {
-                        role: 'user',
-                        content: 'Give me one cool fact about space.'
-                    }
-                ]
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        const fact = aiResponse.data.choices[0].message.content.trim();
-        res.json({ fact });
-    } catch (error) {
-        console.error('AI Fact Error (fact endpoint):', error.response?.data || error.message);
-        res.status(500).json({ fact: 'Unable to fetch space fact at this moment.' });
-    }
-});
-
-// NEW: Endpoint to generate quiz questions (corrected response_format)
-app.post('/quiz', async (req, res) => {
-    const { theme, difficulty } = req.body;
-    const numberOfQuestions = 5; // You can make this configurable if needed
-
-    let promptTheme = theme;
-    if (theme === 'random') {
-        promptTheme = "a random fascinating space-related topic"; // Instruct AI to pick a random theme
+    if (!question) {
+        return res.status(400).json({ error: "Question is required" });
     }
 
     try {
-        const prompt = `Generate a ${numberOfQuestions} question multiple-choice quiz about ${promptTheme} with ${difficulty} difficulty. Each question should have exactly 4 options. Provide the correct answer.`;
-        const systemInstruction = `You are an expert quiz master specializing in space and astronomy. Your task is to generate multiple-choice questions in JSON format. Ensure all questions are unique, accurate, and the options are distinct and plausible. Always provide exactly 4 options per question.
-
-        The JSON response MUST be a single object with a 'questions' key, which is an array of question objects. Each question object MUST have the following keys:
-        - "question": (string) The quiz question.
-        - "options": (array of strings) An array containing exactly 4 multiple-choice options.
-        - "correctAnswer": (string) The correct answer, which must be one of the provided options.
-
-        Example of expected JSON structure:
-        {
-          "questions": [
+        const response = await axios.post(
+            GEMINI_BASE_URL,
             {
-              "question": "Which planet is known as the Red Planet?",
-              "options": ["Earth", "Mars", "Jupiter", "Venus"],
-              "correctAnswer": "Mars"
-            },
-            {
-              "question": "What is the largest moon of Saturn?",
-              "options": ["Io", "Europa", "Titan", "Ganymede"],
-              "correctAnswer": "Titan"
-            }
-          ]
-        }`;
-
-        const aiResponse = await axios.post(
-            'https://openrouter.ai/api/v1/chat/completions',
-            {
-                model: 'openai/gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: systemInstruction
-                    },
+                contents: [
                     {
                         role: 'user',
-                        content: prompt
+                        parts: [
+                            {
+                                text: `Analyze the following question: "${question}".
+                                If the question is about space, provide a short, simple, and direct answer (2-3 sentences maximum) using basic words, without any markdown formatting like asterisks (*), hashtags (#), or backticks (\`).
+                                If the question is NOT about space, respond with appropriate message to make user aware that the question is not space themed and to ask a space themed question"
+                                Always provide your response in the following JSON format:
+                                { "isSpaceThemed": true/false, "responseMessage": "Your answer or the predefined message" }`
+                            }
+                        ]
                     }
                 ],
-                response_format: {
-                    type: "json_object"
+                generationConfig: {
+                    responseMimeType: "application/json", // Instruct Gemini to return JSON
+                    responseSchema: { // Define the expected JSON structure
+                        type: "OBJECT",
+                        properties: {
+                            isSpaceThemed: { type: "BOOLEAN" },
+                            responseMessage: { type: "STRING" }
+                        },
+                        required: ["isSpaceThemed", "responseMessage"]
+                    },
+                    temperature: 0.2, // Keep temperature low for more direct responses and classification
+                    maxOutputTokens: 250 // Limit output tokens to ensure brevity for answers/messages
                 }
             },
-            {
-                headers: {
-                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
+            { headers: geminiHeaders }
         );
 
-        const responseContent = aiResponse.data.choices[0].message.content;
+        const responseDataString = response.data.candidates[0]?.content?.parts[0]?.text;
 
-        let parsedData;
-        try {
-            parsedData = JSON.parse(responseContent);
-        } catch (jsonError) {
-            console.error("Failed to parse AI response as JSON:", jsonError);
-            console.error("Raw AI response content:", responseContent);
-            return res.status(500).json({ error: "AI returned malformed JSON. Please try again." });
-        }
-
-        if (parsedData && parsedData.questions && Array.isArray(parsedData.questions) && parsedData.questions.length > 0) {
-            const isValid = parsedData.questions.every(q =>
-                typeof q.question === 'string' &&
-                Array.isArray(q.options) && q.options.length === 4 &&
-                q.options.every(opt => typeof opt === 'string') &&
-                typeof q.correctAnswer === 'string' &&
-                q.options.includes(q.correctAnswer)
-            );
-
-            if (isValid) {
-                res.json({ questions: parsedData.questions });
-            } else {
-                console.error("AI returned questions in unexpected valid JSON format:", parsedData);
-                res.status(500).json({ error: "AI questions format is incorrect. Please try again." });
-            }
+        if (responseDataString) {
+            const parsedResponse = JSON.parse(responseDataString);
+            res.json({ answer: parsedResponse.responseMessage }); // Send back only the message
         } else {
-            console.error("AI returned questions in unexpected (but valid) JSON format or empty:", parsedData);
-            res.status(500).json({ error: "AI did not return questions in the expected array format or returned an empty array." });
+            console.error("Gemini API did not return expected content for /ask (structured output):", response.data);
+            res.status(500).json({ error: "Failed to get answer: Gemini API response unexpected." });
         }
 
     } catch (error) {
-        console.error('AI Quiz Error (quiz endpoint):', error.response?.data || error.message);
-        if (error.response && error.response.data && error.response.data.error) {
-            res.status(500).json({ error: `Failed to generate quiz questions: ${error.response.data.error.message}` });
-        } else {
-            res.status(500).json({ error: 'Failed to generate quiz questions from the AI model.' });
-        }
+        console.error("Gemini Error (/ask):", {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message
+        });
+        res.status(500).json({
+            error: "Failed to get answer",
+            details: error.response?.data?.error?.message || error.message
+        });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// 2. Space Fact Generator
+app.post('/fact', async (req, res) => {
+    // Receive the forbiddenFacts array from the frontend
+    const { forbiddenFacts = [] } = req.body;
+
+    // Construct the base prompt
+    let promptText = 'Provide one short (1-2 sentence) accurate, and interesting space fact. Do not include any introductory phrases like "Here is a fact" or "Did you know?". Just the fact.';
+
+    // If there are forbidden facts, add them to the prompt
+    if (forbiddenFacts.length > 0) {
+        // Format facts for the prompt to clearly tell the model to avoid them
+        const factsList = forbiddenFacts.map(fact => `"${fact}"`).join(', ');
+        promptText += ` Ensure the fact is NOT one of the following: ${factsList}.`;
+    }
+
+    try {
+        const response = await axios.post(
+            GEMINI_BASE_URL,
+            {
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: promptText }] // Use the dynamically constructed prompt
+                    }
+                ],
+                generationConfig: {
+                    temperature: 0.8, // Slightly higher temp for varied facts
+                    maxOutputTokens: 100 // Keep it short
+                }
+            },
+            { headers: geminiHeaders }
+        );
+
+        const fact = response.data.candidates[0]?.content?.parts[0]?.text?.trim();
+        if (fact) {
+            // Remove any potential leading/trailing quotes or markdown the model might still add
+            const cleanFact = fact.replace(/^["'`\s]+|["'`\s]+$/g, '');
+            res.json({ fact: cleanFact });
+        } else {
+            console.error("Gemini API did not return expected content for /fact:", response.data);
+            res.status(500).json({ fact: "Failed to fetch space fact: Gemini API response unexpected." });
+        }
+
+    } catch (error) {
+        console.error('Gemini Error (/fact):', error.response?.data || error.message);
+        res.status(500).json({ fact: "Failed to fetch space fact" });
+    }
 });
+
+// 3. Quiz Generator
+app.post('/quiz', async (req, res) => {
+    const { theme = 'space', difficulty = 'medium' } = req.body;
+
+    try {
+        const response = await axios.post(
+            GEMINI_BASE_URL,
+            {
+                contents: [
+                    {
+                        role: 'user',
+                        // Instructing the model to output JSON directly within the prompt
+                        parts: [{ text: `Generate 5 multiple-choice quiz questions with 4 options each about ${theme}. Difficulty: ${difficulty}. Ensure the output is in the following JSON format: { "questions": [ { "question": "...", "options": ["...", "..."], "correctAnswer": "..." } ] }` }]
+                    }
+                ],
+                generationConfig: {
+                    responseMimeType: "application/json", // This tells Gemini to attempt to return valid JSON
+                    responseSchema: { // Defines the expected JSON structure
+                        type: "OBJECT",
+                        properties: {
+                            questions: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        question: { type: "STRING" },
+                                        options: { type: "ARRAY", items: { type: "STRING" } },
+                                        correctAnswer: { type: "STRING" }
+                                    },
+                                    required: ["question", "options", "correctAnswer"]
+                                }
+                            }
+                        },
+                        required: ["questions"]
+                    },
+                    temperature: 0.5
+                }
+            },
+            { headers: geminiHeaders }
+        );
+
+        // Parse the JSON string from the response
+        const quizDataString = response.data.candidates[0]?.content?.parts[0]?.text;
+        if (quizDataString) {
+            const quizData = JSON.parse(quizDataString);
+            res.json(quizData);
+        } else {
+            console.error("Gemini API did not return expected content for /quiz:", response.data);
+            res.status(500).json({ error: "Quiz generation failed: Gemini API response unexpected." });
+        }
+
+    } catch (error) {
+        console.error('Gemini Error (/quiz):', {
+            error: error.response?.data || error.message,
+            request: { theme, difficulty }
+        });
+        res.status(500).json({
+            error: "Quiz generation failed",
+            details: error.response?.data?.error?.message || "Internal server error"
+        });
+    }
+});
+
+// Start server with port retry logic
+function startServer(port) {
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+        console.log('Available endpoints:');
+        console.log(`- POST /ask (Question answering)`);
+        console.log(`- POST /fact (Get space facts)`);
+        console.log(`- POST /quiz (Generate space quizzes)`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${port} is already in use. Trying port ${port + 1}...`);
+            startServer(port + 1); // Try the next port
+        } else {
+            console.error('Server error:', err);
+        }
+    });
+}
+
+startServer(PORT);
