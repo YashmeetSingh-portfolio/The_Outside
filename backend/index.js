@@ -237,7 +237,12 @@ startServer(PORT);
 
 // This for server keeping.
 setInterval(() => {
-    https.get(SELF_URL, (res) => {
-        console.log("Self-ping successful");
-    });
+    try{
+
+        https.get(SELF_URL, (res) => {
+            console.log("Self-ping successful");
+        });
+    }catch(error){
+        console.log(error);
+    }
 }, 1000 * 60 * 4); // Every 4 minutes
