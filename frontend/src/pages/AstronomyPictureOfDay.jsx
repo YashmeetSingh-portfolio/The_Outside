@@ -28,7 +28,7 @@ function AstronomyPictureOfDay() {
                 : `http://localhost:5000/api/apod`;
 
             const response = await axios.get(apiUrl);
-            setApodData(response.data); // Set the fetched data to state
+            setApodData(response.data); // Set the fetched data to stat
         } catch (err) {
             console.error('Error fetching APOD data:', err);
             // Extract a user-friendly error message
