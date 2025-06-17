@@ -12,19 +12,48 @@ app.use(bodyParser.json());
 
 // Get API key from environment variables
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Get NASA API key from environment variables
+const NASA_API_KEY = process.env.NASA_API_KEY;
 
 if (!GEMINI_API_KEY) {
     console.error('ERROR: GEMINI_API_KEY is missing in .env file');
     process.exit(1);
 }
+// Add check for NASA_API_KEY
+if (!NASA_API_KEY) {
+    console.error('ERROR: NASA_API_KEY is missing in .env file');
+    process.exit(1);
+}
 
 // Base URL for Gemini API
 const GEMINI_BASE_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Base URL for NASA APOD API
+const NASA_APOD_BASE_URL = 'https://api.nasa.gov/planetary/apod';
 
 // Common headers for Gemini API (Content-Type is usually sufficient as key is in URL)
 const geminiHeaders = {
     'Content-Type': 'application/json'
 };
+
+// --- NEW APOD ENDPOINT ---
+app.get('/api/apod', async (req, res) => {
+    const { date } = req.query; // Get the date from query parameters
+
+    try {
+        let apodUrl = `${NASA_APOD_BASE_URL}?api_key=${NASA_API_KEY}`;
+        if (date) {
+            apodUrl += `&date=${date}`; // Add date if provided
+        }
+
+        const response = await axios.get(apodUrl);
+        res.json(response.data); // Send NASA's response directly to frontend
+    } catch (error) {
+        console.error('Error fetching APOD from NASA:', error.response?.data || error.message);
+        // NASA API returns error messages in a specific format, try to pass that
+        const errorMessage = error.response?.data?.msg || 'Failed to fetch Astronomy Picture of the Day from NASA.';
+        res.status(error.response?.status || 500).json({ error: errorMessage });
+    }
+});
 
 // 1. Question Answering Endpoint
 app.post('/ask', async (req, res) => {
@@ -209,6 +238,7 @@ function startServer(port) {
     app.listen(port, () => {
         console.log(`Server running on http://localhost:${port}`);
         console.log('Available endpoints:');
+        console.log(`- GET /api/apod (Astronomy Picture of the Day)`); // Added this line
         console.log(`- POST /ask (Question answering)`);
         console.log(`- POST /fact (Get space facts)`);
         console.log(`- POST /quiz (Generate space quizzes)`);

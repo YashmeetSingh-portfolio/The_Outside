@@ -5,15 +5,17 @@
 .apod-container {
     position: relative;
     width: 100%;
-    min-height: 80vh;
+    min-height: 80vh; /* Adjust as needed, considering Navbar */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Changed to column to stack main title, form, and content */
+    justify-content: flex-start; /* Align content from the top */
     align-items: center;
     overflow: hidden;
     background: linear-gradient(135deg, #0c0118, #1a0b2e, #0c0118);
     font-family: 'Rajdhani', sans-serif;
     color: #e0e6ff;
     padding: 2rem 1rem;
+    box-sizing: border-box; /* Include padding in the element's total width and height */
 }
 
 /* Stars background effect */
@@ -33,7 +35,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 4px),
         radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 3px),
         radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 4px);
@@ -55,29 +57,100 @@
 .apod-content {
     position: relative;
     z-index: 1;
-    height: 35%;
-    width: 40%;
-    max-width: 1200px;
+    width: 90%; /* Increased width for better responsiveness */
+    max-width: 900px; /* Max width for content */
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 2rem; /* Add some padding at the top for content below Navbar */
+    box-sizing: border-box;
 }
 
 /* Main title styling */
 .apod-main-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.8rem; /* Slightly larger */
     font-weight: 700;
-    margin-top: 5rem;
-    margin-bottom: 2rem;
+    margin-top: 5rem; /* Adjust based on NavBar height and desired spacing */
+    margin-bottom: 2.5rem; /* More space below title */
     text-align: center;
     background: linear-gradient(to right, #ffffff, #a2c0ff);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 15px rgba(162, 192, 255, 0.3);
-    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(162, 192, 255, 0.4); /* Stronger glow */
+    letter-spacing: 3px; /* More prominent spacing */
 }
+
+/* --- New: Date Selection Form Styling --- */
+.apod-date-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem; /* Increased gap */
+    margin-bottom: 3rem; /* More space below the form */
+    background: rgba(26, 11, 46, 0.6); /* Slightly darker, semi-transparent */
+    padding: 1.2rem 2.5rem; /* More padding */
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+    border: 1px solid rgba(100, 180, 255, 0.3); /* Match frame border style */
+    backdrop-filter: blur(8px); /* Consistent blur */
+}
+
+.apod-date-form label {
+    font-size: 1.15rem; /* Slightly larger font */
+    color: #e0e6ff;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+}
+
+.apod-date-form input[type="date"] {
+    padding: 0.8rem 1rem;
+    border: 1px solid #4a6480;
+    border-radius: 8px;
+    background-color: #1a0b2e; /* Darker input background */
+    color: #e0e6ff;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.apod-date-form input[type="date"]:hover,
+.apod-date-form input[type="date"]:focus {
+    border-color: #a2c0ff;
+    box-shadow: 0 0 12px rgba(162, 192, 255, 0.5); /* Stronger glow on hover/focus */
+}
+
+/* Styling for the date picker icon (make it visible on dark backgrounds) */
+.apod-date-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the calendar icon white/light */
+    cursor: pointer;
+}
+
+.apod-date-form button {
+    padding: 0.8rem 1.8rem; /* More padding */
+    background: linear-gradient(45deg, #007bff, #00d2ff); /* Blue gradient button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+.apod-date-form button:hover {
+    background: linear-gradient(45deg, #0056b3, #00b0e0);
+    transform: translateY(-3px); /* More pronounced lift */
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* --- End New: Date Selection Form Styling --- */
 
 /* Holographic frame styling */
 .apod-frame {
@@ -86,16 +159,17 @@
     backdrop-filter: blur(10px);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(0, 140, 255, 0.15),
         0 0 5px rgba(0, 140, 255, 0.1),
         inset 0 0 10px rgba(0, 140, 255, 0.05);
     border: 1px solid rgba(100, 180, 255, 0.2);
     transition: all 0.3s ease;
+    margin-bottom: 2rem; /* Add margin below the frame */
 }
 
 .apod-frame:hover {
-    box-shadow: 
+    box-shadow:
         0 0 40px rgba(0, 140, 255, 0.25),
         0 0 10px rgba(0, 140, 255, 0.15),
         inset 0 0 15px rgba(0, 140, 255, 0.1);
@@ -134,18 +208,22 @@
 
 .frame-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.95rem; /* Slightly larger */
     font-weight: 500;
     letter-spacing: 1px;
     color: #a2c0ff;
 }
 
-/* Image container styling */
+/* Image/Video container styling */
 .image-container {
     width: 100%;
     position: relative;
     overflow: hidden;
     background: #000;
+    display: flex; /* Use flex to center image/video if it doesn't fill */
+    justify-content: center;
+    align-items: center;
+    min-height: 350px; /* Ensure a minimum height for media */
 }
 
 .apod-image {
@@ -153,70 +231,175 @@
     height: auto;
     display: block;
     transition: transform 0.5s ease;
+    object-fit: contain; /* Ensures the entire image is visible within its container */
 }
 
 .image-container:hover .apod-image {
     transform: scale(1.02);
 }
 
+/* --- New: Video Player Styling --- */
+.apod-video {
+    width: 100%;
+    height: auto; /* Allow height to adjust based on aspect ratio */
+    min-height: 350px; /* Same min-height as image container */
+    aspect-ratio: 16 / 9; /* Standard widescreen aspect ratio */
+    display: block;
+    background-color: #000; /* Black background for video player */
+    border: none;
+}
+/* --- End New: Video Player Styling --- */
+
 /* Info section styling */
 .apod-info {
     padding: 1.5rem 2rem 2rem;
+    text-align: left; /* Align text left within the info box */
 }
 
 .apod-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Slightly larger */
     font-weight: 600;
     margin-bottom: 1rem;
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(162, 192, 255, 0.3);
+    text-shadow: 0 0 12px rgba(162, 192, 255, 0.4); /* Stronger glow */
 }
 
 .apod-description {
-    font-size: 1.1rem;
-    line-height: 1.6;
+    font-size: 1.05rem; /* Slightly smaller for readability */
+    line-height: 1.7;
     color: #c8d3ff;
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem; /* Space before copyright */
 }
 
+.apod-copyright {
+    font-size: 0.85rem; /* Slightly smaller */
+    color: #92a4b8;
+    text-align: right; /* Keep copyright right-aligned */
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+/* --- New: Loading and Error Message Styling --- */
+.apod-message {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    color: #00e676; /* Green from indicator */
+    text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+    margin-top: 3rem; /* Space below form */
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.apod-error-message {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: #ff6b6b; /* Reddish tone for errors */
+    font-weight: bold;
+    margin-top: 3rem; /* Space below form */
+    margin-bottom: 2rem;
+    text-align: center;
+    background-color: rgba(255, 107, 107, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid #ff6b6b;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+}
+/* --- End New: Loading and Error Message Styling --- */
+
+
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+    .apod-content {
+        width: 95%; /* Make content a bit wider on medium screens */
+        max-width: 768px;
+    }
     .apod-main-title {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
     }
-    
+    .apod-date-form {
+        flex-direction: column; /* Stack date input and button */
+        gap: 1rem;
+        padding: 1rem 2rem;
+    }
+    .apod-date-form input[type="date"],
+    .apod-date-form button {
+        width: 100%; /* Make them full width */
+        max-width: 300px; /* Limit their max width */
+    }
     .apod-title {
-        font-size: 1.3rem;
+        font-size: 1.6rem;
     }
-    
     .apod-description {
         font-size: 1rem;
     }
-    
+    .image-container, .apod-video {
+        min-height: 300px; /* Adjust min height for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .apod-main-title {
+        font-size: 1.8rem;
+        margin-top: 3rem; /* Less margin on smaller screens */
+        margin-bottom: 2rem;
+    }
+    .apod-date-form {
+        padding: 0.8rem 1.5rem;
+        gap: 0.8rem;
+    }
+    .apod-title {
+        font-size: 1.4rem;
+    }
+    .apod-description {
+        font-size: 0.95rem;
+    }
     .apod-info {
         padding: 1.2rem 1.5rem 1.5rem;
+    }
+    .image-container, .apod-video {
+        min-height: 250px; /* Further adjust min height for smaller screens */
     }
 }
 
 @media (max-width: 480px) {
+    .apod-container {
+        padding: 1rem 0.5rem; /* Less padding on very small screens */
+    }
     .apod-main-title {
         font-size: 1.5rem;
+        letter-spacing: 1px;
     }
-    
+    .apod-date-form {
+        padding: 0.6rem 1rem;
+        gap: 0.6rem;
+    }
+    .apod-date-form label,
+    .apod-date-form input[type="date"],
+    .apod-date-form button {
+        font-size: 0.9rem;
+    }
     .frame-header {
         padding: 0.8rem 1rem;
     }
-    
     .frame-title {
         font-size: 0.8rem;
     }
-    
     .apod-title {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
-    
+    .apod-description {
+        font-size: 0.9rem;
+    }
     .apod-info {
+        padding: 1rem;
+    }
+    .image-container, .apod-video {
+        min-height: 200px; /* Smallest min height */
+    }
+    .apod-message, .apod-error-message {
+        font-size: 1rem;
         padding: 1rem;
     }
 }
