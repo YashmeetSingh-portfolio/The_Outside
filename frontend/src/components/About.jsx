@@ -1,6 +1,6 @@
-// src/components/About.jsx
-import React from 'react'; // No need for forwardRef
-import './comp_styles/About.css';
+
+import React from 'react';
+import './comp_styles/about.css';
 
 const About = () => { // No ref prop
     return (
