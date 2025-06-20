@@ -21,7 +21,7 @@
     overflow: hidden;
     font-family: var(--font-main);
     color: white;
-    background-image: url('../../assets/missionHighlight.jpg');
+    background-image: url('../../assets/missionHighlight.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

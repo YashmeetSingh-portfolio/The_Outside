@@ -11,7 +11,7 @@
     justify-content: flex-start; /* Align content from the top */
     align-items: center;
     overflow: hidden;
-    background-image: url('../assets/LearnBG.jpg');
+    background-image: url('../assets/LearnBG.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

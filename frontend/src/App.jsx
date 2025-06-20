@@ -25,7 +25,7 @@ function App() {
     }
 
     return (
-        <Router>
+        <Router basename={'/'}>
             {/* NEW: ToastContainer for global notifications */}
             <ToastContainer
                 position="top-right"

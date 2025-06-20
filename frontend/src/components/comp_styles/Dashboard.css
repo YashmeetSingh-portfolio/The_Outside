@@ -1,6 +1,6 @@
 .cockpit-hero {
     position: relative;
-    background-image: url("../../assets/cockpit.jpg");
+    background-image: url("../../assets/cockpit.webp");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -21,7 +21,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.26);
     z-index: 0;
 }
 

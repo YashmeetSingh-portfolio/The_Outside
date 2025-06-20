@@ -1,7 +1,7 @@
 .destination-container {
     position: relative;
     padding: 4rem 2rem;
-    background-image: url("../../assets/cockpit.jpg");
+    background-image: url("../../assets/cockpit.webp");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -17,7 +17,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6); /* Darker overlay for better contrast */
+    background: rgba(0, 0, 0, 0.26); /* Darker overlay for better contrast */
     z-index: 0;
 }
 
