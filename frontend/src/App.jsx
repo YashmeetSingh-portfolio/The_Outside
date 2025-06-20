@@ -1,46 +1,60 @@
+// src/App.jsx
 import React from 'react';
-import ReactDOM from "react-dom/client";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
-import Home from './pages/Home.jsx'
-import Login from './pages/Login.jsx'
-import Signup from './pages/Signup.jsx'
-import ExploreSolarSystem from './pages/ExploreSolarSystem.jsx'
-import ISSTracker from './pages/ISSTracker.jsx'
-import AISpaceFacts from './pages/AISpaceFacts.jsx'
-import AISpaceQuiz from './pages/AISpaceQuiz.jsx'
-import AskDoubtPage from './pages/AskDoubtPage.jsx'
-import AstronomyPictureOfDay from './pages/AstronomyPictureOfDay.jsx'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify'; // NEW: Import ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // NEW: Import Toastify CSS
+
+import Home from './pages/Home.jsx';
+import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
+import ExploreSolarSystem from './pages/ExploreSolarSystem.jsx';
+import ISSTracker from './pages/ISSTracker.jsx';
+import AISpaceFacts from './pages/AISpaceFacts.jsx';
+import AISpaceQuiz from './pages/AISpaceQuiz.jsx';
+import AskDoubtPage from './pages/AskDoubtPage.jsx';
+import AstronomyPictureOfDay from './pages/AstronomyPictureOfDay.jsx';
+import PrivateRoute from './components/PrivateRoute';
+import { useAuthStatus } from './hooks/useAuthStatus';
 import 'leaflet/dist/leaflet.css';
 
 function App() {
+    const { checkingStatus } = useAuthStatus();
+
+    if (checkingStatus) {
+        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0a0a20', color: 'white', fontSize: '2rem' }}>Loading The Outside...</div>;
+    }
+
     return (
-        <BrowserRouter>
+        <Router>
+            {/* NEW: ToastContainer for global notifications */}
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark" // Or 'light' or 'colored'
+            />
             <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
 
-                <Route path="/" element={<Home/>}>
-
-                </Route>
-                <Route path="/login" element={<Login/>}>
-                </Route>
-                <Route path="/signup" element={<Signup/>}>
-                </Route>
-                <Route path="/solarSystem" element={<ExploreSolarSystem/>}>
-                </Route>
-                <Route path="/ISSTracking" element={<ISSTracker/>}>
-                </Route>
-                <Route path="/spacefacts" element={<AISpaceFacts/>}>
-                </Route>
-                <Route path="/spacequiz" element={<AISpaceQuiz/>}>
-                </Route>
-                <Route path="/askdoubt" element={<AskDoubtPage/>}>
-                </Route>
-                <Route path="/apod" element={<AstronomyPictureOfDay/>}>
-                </Route>
+                {/* Protected Routes */}
+                <Route path="/solarSystem" element={<PrivateRoute><ExploreSolarSystem /></PrivateRoute>} />
+                <Route path="/ISSTracking" element={<PrivateRoute><ISSTracker /></PrivateRoute>} />
+                <Route path="/spacefacts" element={<PrivateRoute><AISpaceFacts /></PrivateRoute>} />
+                <Route path="/spacequiz" element={<PrivateRoute><AISpaceQuiz /></PrivateRoute>} />
+                <Route path="/askdoubt" element={<PrivateRoute><AskDoubtPage /></PrivateRoute>} />
+                <Route path="/apod" element={<PrivateRoute><AstronomyPictureOfDay /></PrivateRoute>} />
+                <Route path="/dashboard" element={<PrivateRoute><div>Welcome to your Dashboard!</div></PrivateRoute>} />
             </Routes>
-        </BrowserRouter>
-    )
+        </Router>
+    );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App/>);
-export default App
+export default App;

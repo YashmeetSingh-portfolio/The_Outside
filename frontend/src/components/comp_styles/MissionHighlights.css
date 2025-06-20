@@ -1,130 +1,99 @@
-/* Import space-themed font */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+    --text-glow: 0 0 10px rgba(136, 200, 255, 0.3);
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --font-main: 'Exo', sans-serif;
+}
 
 /* Base styles */
 .mission-container {
-    position: relative;
     width: 100%;
     min-height: 100vh;
+    scroll-snap-align: start;
+    position: sticky;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 4rem 2rem;
     overflow: hidden;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--font-main);
     color: white;
-    background: radial-gradient(circle, #000000, #1d1b3d, #000000);
-
+    background-image: url('../../assets/missionHighlight.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
 }
 
-/* Space background with stars - reusing from Hero but with different gradient */
-.stars-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    z-index: -2;
-}
-
-/* Stars animation - reusing from Hero */
-.stars-background::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 4px),
-    radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 3px),
-    radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 4px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px;
-    z-index: -1;
-    animation: twinkle 8s ease-in-out infinite alternate;
-}
-
-@keyframes twinkle {
-    0% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-/* Mission content container */
 .mission-content {
-
     width: 100%;
     max-width: 1200px;
     text-align: center;
     z-index: 1;
-
+    padding: 0 1rem;
 }
 
 /* Typography */
 .mission-title {
-    font-size: 3rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 800;
     margin-bottom: 1rem;
     background: linear-gradient(to right, #ffffff, #88c8ff);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 10px rgba(136, 200, 255, 0.3);
+    text-shadow: var(--text-glow);
 }
 
 .mission-subtitle {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2vw, 1.2rem);
     font-weight: 400;
     margin-bottom: 3rem;
     line-height: 1.6;
     color: #e0e0ff;
     max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
 }
 
 /* Feature grid */
 .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 2rem;
     width: 100%;
 }
 
 /* Feature card with glassmorphism */
 .feature-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     overflow: hidden;
+    max-width: 100%;
 }
 
 /* Glowing border effect */
 .feature-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     border-radius: 15px;
     padding: 2px;
     background: linear-gradient(45deg, #3498db, #2ecc71, #9b59b6);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0.5;
@@ -140,7 +109,7 @@
 
 /* Feature title */
 .feature-title {
-    font-size: 1.5rem;
+    font-size: clamp(1.3rem, 2vw, 1.5rem);
     font-weight: 600;
     margin-bottom: 1rem;
     color: #ffffff;
@@ -148,7 +117,7 @@
 
 /* Feature description */
 .feature-description {
-    font-size: 1rem;
+    font-size: clamp(0.95rem, 1.8vw, 1rem);
     line-height: 1.5;
     color: #e0e0ff;
 }
@@ -156,44 +125,30 @@
 /* Hover effects */
 .feature-card:hover {
     transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 40px 0 rgba(31, 38, 135, 0.3);
+    box-shadow: 0 15px 40px rgba(31, 38, 135, 0.3);
 }
 
 .feature-card:hover::before {
     opacity: 0.8;
 }
 
-/* Responsive design */
-@media (max-width: 992px) {
-    .feature-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
+/* Responsive paddings and layout tweaks */
 @media (max-width: 768px) {
     .mission-container {
-        padding: 3rem 1.5rem;
+        padding: 3rem 1rem;
     }
 
-    .mission-title {
-        font-size: 2.5rem;
-    }
-
-    .mission-subtitle {
-        font-size: 1.1rem;
+    .feature-card {
+        padding: 1.5rem;
     }
 }
 
-@media (max-width: 576px) {
-    .feature-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .mission-title {
-        font-size: 2rem;
+@media (max-width: 480px) {
+    .mission-container {
+        padding: 2rem 1rem;
     }
 
     .mission-subtitle {
-        font-size: 1rem;
+        margin-bottom: 2rem;
     }
 }

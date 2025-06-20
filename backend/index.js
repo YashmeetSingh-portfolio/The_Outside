@@ -2,62 +2,123 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-require('dotenv').config();
+require('dotenv').config(); // Load environment variables from .env
+const admin = require('firebase-admin'); // Firebase Admin SDK
+
+// --- MongoDB Imports and Connection Setup ---
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+// Get MongoDB URI from environment variables
+const MONGODB_URI = process.env.MONGODB_URI;
+
+// Check if MONGODB_URI is provided
+if (!MONGODB_URI) {
+    console.error('ERROR: MONGODB_URI is missing in .env file. Please set it to connect to MongoDB Atlas.');
+    process.exit(1); // Exit if database connection string is not found
+}
+
+let db; // Global variable to store the MongoDB database connection instance
+
+// Function to connect to MongoDB Atlas
+async function connectToMongo() {
+    try {
+        const client = new MongoClient(MONGODB_URI, {
+            serverApi: {
+                version: ServerApiVersion.v1, // Specify MongoDB API version
+                strict: true,
+                deprecationErrors: true,
+            }
+        });
+        await client.connect(); // Establish connection to MongoDB Atlas
+        console.log("Successfully connected to MongoDB Atlas!");
+        // Select the database to use. If it doesn't exist, MongoDB will create it on first write.
+        db = client.db("the_outside_db"); // You can name your database whatever you like here
+    } catch (error) {
+        console.error("Error connecting to MongoDB Atlas:", error);
+        // If the database connection fails, the application cannot function correctly, so exit.
+        process.exit(1);
+    }
+}
+// --- END MongoDB Connection Setup ---
 
 const app = express();
-let PORT = 5000; // Let's make PORT mutable so we can try other ports
+let PORT = 5000; // Default port, with retry logic for EADDRINUSE
 
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors()); // Enable CORS for all routes (important for frontend-backend communication)
+app.use(bodyParser.json()); // Parse JSON request bodies
 
-// Get API key from environment variables
+// --- Firebase Admin SDK Initialization ---
+const serviceAccount = require('./firebase-admin-sdk.json'); // Path to your Firebase Admin SDK service account key file
+
+try {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+    console.log('Firebase Admin SDK initialized successfully.');
+} catch (error) {
+    console.error('Error initializing Firebase Admin SDK:', error.message);
+    process.exit(1);
+}
+
+// --- Middleware for Firebase ID Token Verification ---
+const authenticateFirebaseToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'No authentication token provided. Authorization header missing or malformed.' });
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        req.user = decodedToken;
+        next();
+    } catch (error) {
+        console.error('Error verifying Firebase ID token:', error.message);
+        return res.status(403).json({ error: 'Unauthorized. Invalid or expired authentication token.' });
+    }
+};
+
+// --- API Key setup for external services ---
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-// Get NASA API key from environment variables
 const NASA_API_KEY = process.env.NASA_API_KEY;
 
 if (!GEMINI_API_KEY) {
     console.error('ERROR: GEMINI_API_KEY is missing in .env file');
     process.exit(1);
 }
-// Add check for NASA_API_KEY
 if (!NASA_API_KEY) {
     console.error('ERROR: NASA_API_KEY is missing in .env file');
     process.exit(1);
 }
 
-// Base URL for Gemini API
 const GEMINI_BASE_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-// Base URL for NASA APOD API
 const NASA_APOD_BASE_URL = 'https://api.nasa.gov/planetary/apod';
 
-// Common headers for Gemini API (Content-Type is usually sufficient as key is in URL)
 const geminiHeaders = {
     'Content-Type': 'application/json'
 };
 
-// --- NEW APOD ENDPOINT ---
-app.get('/api/apod', async (req, res) => {
-    const { date } = req.query; // Get the date from query parameters
+// --- Existing API Endpoints (from your previous code) ---
 
+app.get('/api/apod', async (req, res) => {
+    const { date } = req.query;
     try {
         let apodUrl = `${NASA_APOD_BASE_URL}?api_key=${NASA_API_KEY}`;
         if (date) {
-            apodUrl += `&date=${date}`; // Add date if provided
+            apodUrl += `&date=${date}`;
         }
-
         const response = await axios.get(apodUrl);
-        res.json(response.data); // Send NASA's response directly to frontend
+        res.json(response.data);
     } catch (error) {
         console.error('Error fetching APOD from NASA:', error.response?.data || error.message);
-        // NASA API returns error messages in a specific format, try to pass that
         const errorMessage = error.response?.data?.msg || 'Failed to fetch Astronomy Picture of the Day from NASA.';
         res.status(error.response?.status || 500).json({ error: errorMessage });
     }
 });
 
-// 1. Question Answering Endpoint
-app.post('/ask', async (req, res) => {
+app.post('/ask', authenticateFirebaseToken, async (req, res) => {
     const { question } = req.body;
+    console.log(`Protected /ask endpoint accessed by user UID: ${req.user.uid}`);
+    console.log(`User email: ${req.user.email}`);
 
     if (!question) {
         return res.status(400).json({ error: "Question is required" });
@@ -82,17 +143,17 @@ app.post('/ask', async (req, res) => {
                     }
                 ],
                 generationConfig: {
-                    responseMimeType: "application/json", // Instruct Gemini to return JSON
-                    responseSchema: { // Define the expected JSON structure
+                    responseMimeType: "application/json",
+                    responseSchema: {
                         type: "OBJECT",
                         properties: {
                             isSpaceThemed: { type: "BOOLEAN" },
                             responseMessage: { type: "STRING" }
                         },
-                        required: ["isSpaceThemed", "responseMessage"]
+                        required: ["isSpaceTheemed", "responseMessage"]
                     },
-                    temperature: 0.2, // Keep temperature low for more direct responses and classification
-                    maxOutputTokens: 250 // Limit output tokens to ensure brevity for answers/messages
+                    temperature: 0.2,
+                    maxOutputTokens: 250
                 }
             },
             { headers: geminiHeaders }
@@ -102,7 +163,7 @@ app.post('/ask', async (req, res) => {
 
         if (responseDataString) {
             const parsedResponse = JSON.parse(responseDataString);
-            res.json({ answer: parsedResponse.responseMessage }); // Send back only the message
+            res.json({ answer: parsedResponse.responseMessage });
         } else {
             console.error("Gemini API did not return expected content for /ask (structured output):", response.data);
             res.status(500).json({ error: "Failed to get answer: Gemini API response unexpected." });
@@ -121,17 +182,11 @@ app.post('/ask', async (req, res) => {
     }
 });
 
-// 2. Space Fact Generator
-app.post('/fact', async (req, res) => {
-    // Receive the forbiddenFacts array from the frontend
+app.post('/fact', authenticateFirebaseToken, async (req, res) => {
     const { forbiddenFacts = [] } = req.body;
-
-    // Construct the base prompt
     let promptText = 'Provide one short (1-2 sentence) accurate, and interesting space fact. Do not include any introductory phrases like "Here is a fact" or "Did you know?". Just the fact.';
 
-    // If there are forbidden facts, add them to the prompt
     if (forbiddenFacts.length > 0) {
-        // Format facts for the prompt to clearly tell the model to avoid them
         const factsList = forbiddenFacts.map(fact => `"${fact}"`).join(', ');
         promptText += ` Ensure the fact is NOT one of the following: ${factsList}.`;
     }
@@ -143,12 +198,12 @@ app.post('/fact', async (req, res) => {
                 contents: [
                     {
                         role: 'user',
-                        parts: [{ text: promptText }] // Use the dynamically constructed prompt
+                        parts: [{ text: promptText }]
                     }
                 ],
                 generationConfig: {
-                    temperature: 0.8, // Slightly higher temp for varied facts
-                    maxOutputTokens: 100 // Keep it short
+                    temperature: 0.8,
+                    maxOutputTokens: 100
                 }
             },
             { headers: geminiHeaders }
@@ -156,7 +211,6 @@ app.post('/fact', async (req, res) => {
 
         const fact = response.data.candidates[0]?.content?.parts[0]?.text?.trim();
         if (fact) {
-            // Remove any potential leading/trailing quotes or markdown the model might still add
             const cleanFact = fact.replace(/^["'`\s]+|["'`\s]+$/g, '');
             res.json({ fact: cleanFact });
         } else {
@@ -170,9 +224,16 @@ app.post('/fact', async (req, res) => {
     }
 });
 
-// 3. Quiz Generator
-app.post('/quiz', async (req, res) => {
+app.post('/quiz', authenticateFirebaseToken, async (req, res) => {
     const { theme = 'space', difficulty = 'medium' } = req.body;
+
+    let promptText;
+    // Modified prompt based on whether theme is 'random' or specific
+    if (theme === 'random') {
+        promptText = `Generate 5 multiple-choice quiz questions with 4 options each about various, distinct aspects of space (e.g., planets, stars, galaxies, missions, black holes, exoplanets, cosmology, space history, rockets). Ensure each question is from a potentially different sub-theme of space. Difficulty: ${difficulty}. Ensure the output is in the following JSON format: { "questions": [ { "question": "...", "options": ["...", "..."], "correctAnswer": "..." } ] }`;
+    } else {
+        promptText = `Generate 5 multiple-choice quiz questions with 4 options each about ${theme}. Difficulty: ${difficulty}. Ensure the output is in the following JSON format: { "questions": [ { "question": "...", "options": ["...", "..."], "correctAnswer": "..." } ] }`;
+    }
 
     try {
         const response = await axios.post(
@@ -181,13 +242,12 @@ app.post('/quiz', async (req, res) => {
                 contents: [
                     {
                         role: 'user',
-                        // Instructing the model to output JSON directly within the prompt
-                        parts: [{ text: `Generate 5 multiple-choice quiz questions with 4 options each about ${theme}. Difficulty: ${difficulty}. Ensure the output is in the following JSON format: { "questions": [ { "question": "...", "options": ["...", "..."], "correctAnswer": "..." } ] }` }]
+                        parts: [{ text: promptText }]
                     }
                 ],
                 generationConfig: {
-                    responseMimeType: "application/json", // This tells Gemini to attempt to return valid JSON
-                    responseSchema: { // Defines the expected JSON structure
+                    responseMimeType: "application/json",
+                    responseSchema: {
                         type: "OBJECT",
                         properties: {
                             questions: {
@@ -211,7 +271,6 @@ app.post('/quiz', async (req, res) => {
             { headers: geminiHeaders }
         );
 
-        // Parse the JSON string from the response
         const quizDataString = response.data.candidates[0]?.content?.parts[0]?.text;
         if (quizDataString) {
             const quizData = JSON.parse(quizDataString);
@@ -233,50 +292,153 @@ app.post('/quiz', async (req, res) => {
     }
 });
 
+app.get('/api/protected-data', authenticateFirebaseToken, (req, res) => {
+    res.json({
+        message: 'You have successfully accessed protected data!',
+        uid: req.user.uid,
+        email: req.user.email,
+        name: req.user.name || 'N/A'
+    });
+});
+
+// --- MongoDB Atlas Endpoints for User Profiles ---
+app.post('/api/profiles', async (req, res) => {
+    const { firebaseUid, fullName, email } = req.body;
+
+    if (!firebaseUid || !fullName || !email) {
+        return res.status(400).json({ error: 'Missing required fields: firebaseUid, fullName, email.' });
+    }
+
+    try {
+        if (!db) {
+            console.error('MongoDB database connection not established.');
+            return res.status(500).json({ error: 'Database not connected.' });
+        }
+        const profilesCollection = db.collection('profiles');
+
+        const result = await profilesCollection.updateOne(
+            { _id: firebaseUid },
+            {
+                $set: {
+                    full_name: fullName,
+                    email: email,
+                    updated_at: new Date(),
+                },
+                $setOnInsert: {
+                    xp: 0,
+                    created_at: new Date(),
+                }
+            },
+            { upsert: true }
+        );
+
+        if (result.upsertedCount > 0) {
+            res.status(201).json({ message: 'Profile created successfully.', profileId: firebaseUid });
+        } else {
+            res.status(200).json({ message: 'Profile updated successfully.', profileId: firebaseUid });
+        }
+
+    } catch (error) {
+        console.error('Error in /api/profiles POST endpoint:', error);
+        res.status(500).json({ error: 'Failed to create or update profile.', details: error.message });
+    }
+});
+
+app.get('/api/profiles/:firebaseUid', async (req, res) => {
+    const firebaseUid = req.params.firebaseUid;
+
+    if (!firebaseUid) {
+        return res.status(400).json({ error: 'Firebase UID is required.' });
+    }
+
+    try {
+        if (!db) {
+            console.error('MongoDB database connection not established.');
+            return res.status(500).json({ error: 'Database not connected.' });
+        }
+        const profilesCollection = db.collection('profiles');
+        const profile = await profilesCollection.findOne({ _id: firebaseUid });
+
+        if (profile) {
+            res.status(200).json(profile);
+        } else {
+            res.status(404).json({ error: 'Profile not found.' });
+        }
+
+    } catch (error) {
+        console.error('Error in /api/profiles/:firebaseUid GET endpoint:', error);
+        res.status(500).json({ error: 'Failed to fetch profile.', details: error.message });
+    }
+});
+
+app.put('/api/profiles/:firebaseUid/add-xp', authenticateFirebaseToken, async (req, res) => {
+    const firebaseUid = req.params.firebaseUid;
+    const { xpToAdd } = req.body;
+
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ error: 'Forbidden: You can only update your own profile XP.' });
+    }
+
+    if (typeof xpToAdd !== 'number' || !Number.isInteger(xpToAdd)) {
+        return res.status(400).json({ error: 'Invalid XP amount. Must be an integer number.' });
+    }
+
+    try {
+        if (!db) {
+            console.error('MongoDB database connection not established.');
+            return res.status(500).json({ error: 'Database not connected.' });
+        }
+        const profilesCollection = db.collection('profiles');
+
+        const result = await profilesCollection.updateOne(
+            { _id: firebaseUid },
+            {
+                $inc: { xp: xpToAdd },
+                $set: { updated_at: new Date() }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Profile not found to update XP.' });
+        }
+
+        const updatedProfile = await profilesCollection.findOne({ _id: firebaseUid });
+        res.status(200).json({ message: 'XP updated successfully.', newXp: updatedProfile.xp });
+
+    } catch (error) {
+        console.error('Error in /api/profiles/:firebaseUid/add-xp PUT endpoint:', error);
+        res.status(500).json({ error: 'Failed to update XP.', details: error.message });
+    }
+});
+// --- END MongoDB Atlas Endpoints ---
 
 
-// This for server keeping.
-const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-
-
-// Start server with port retry logic
-function startServer(port) {
-    app.listen(port, () => {
-        console.log(`Server running on ${SELF_URL}`);
-        console.log('Available endpoints:');
-        console.log(`- GET /api/apod (Astronomy Picture of the Day)`); // Added this line
-        console.log(`- POST /ask (Question answering)`);
-        console.log(`- POST /fact (Get space facts)`);
-        console.log(`- POST /quiz (Generate space quizzes)`);
+// --- Server Start Logic ---
+async function startApp() {
+    await connectToMongo();
+    app.listen(PORT, () => {
+        console.log(`Backend Server running on http://localhost:${PORT}`);
+        console.log('Available API endpoints:');
+        console.log(`- GET /api/apod (Astronomy Picture of the Day - Public)`);
+        console.log(`- POST /ask (Question answering - PROTECTED)`);
+        console.log(`- POST /fact (Get space facts - PROTECTED)`);
+        console.log(`- POST /quiz (Generate space quizzes - PROTECTED)`);
+        console.log(`- GET /api/protected-data (Example Protected Route - PROTECTED)`);
+        console.log(`- POST /api/profiles (Create/Update user profile - Publicly accessible for signup)`);
+        console.log(`- GET /api/profiles/:firebaseUid (Get user profile - Consider protecting)`);
+        console.log(`- PUT /api/profiles/:firebaseUid/xp (Update user XP - PROTECTED)`); // New XP endpoint
+        console.log(`- PUT /api/profiles/:firebaseUid/add-xp (Add XP to user profile - PROTECTED)`); // New XP endpoint
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
-            console.log(`Port ${port} is already in use. Trying port ${port + 1}...`);
-            startServer(port + 1); // Try the next port
+            console.log(`Port ${PORT} is already in use. Trying port ${PORT + 1}...`);
+            PORT++;
+            startApp();
         } else {
             console.error('Server error:', err);
+            process.exit(1);
         }
     });
 }
 
-<<<<<<< HEAD
-startServer(PORT);
-=======
-startServer(PORT);
-
-
-
-
-
-
-// This for server keeping.
-setInterval(() => {
-    try{
-
-        https.get(SELF_URL, (res) => {
-            console.log("Self-ping successful");
-        });
-    }catch(error){
-        console.log(error);
-    }
-}, 1000 * 60 * 4); // Every 4 minutes
->>>>>>> 25355e689e8a100c3b8c0c536b5f6407e4f8ffbb
+// Initiate the application start process
+startApp();

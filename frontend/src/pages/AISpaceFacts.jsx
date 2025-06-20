@@ -51,7 +51,7 @@ function AISpaceFacts() {
             <Navbar />
             <div className="space-facts-container">
                 <div className="stars-background"></div>
-                <div className="nebula-effect"></div>
+       
 
                 <main className="space-facts-content">
                     <h1 className="section-title">🧠 AI Space Facts</h1>

@@ -19,6 +19,14 @@
 
 
 }
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    max-width: 100%;
+
+}
 
 /* Track */
 ::-webkit-scrollbar-track {
@@ -59,8 +67,12 @@ body {
     min-width: 320px;
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: auto;
 }
-
+.comp{
+    position: sticky;
+    top: 0;
+}
 h1 {
     font-size: 3.2em;
     line-height: 1.1;
@@ -99,5 +111,10 @@ button:focus-visible {
 
     button {
         background-color: #f9f9f9;
+    }
+}
+@media (max-width: 768px) {
+   html, body {
+        overflow-x: hidden;
     }
 }

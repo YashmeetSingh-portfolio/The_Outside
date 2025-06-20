@@ -1,7 +1,10 @@
 /* Main Container */
 .quiz-container {
     min-height: 100vh;
-    background-color: #050714;
+    background-image: url('../assets/LearnBG.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #ffffff;
     position: relative;
     overflow: hidden;
@@ -818,3 +821,235 @@
         font-size: 1rem;
     }
 }
+/* Add these new CSS rules to the end of your existing src/styles/AISpaceQuiz.css file */
+
+/* --- NEW XP Styles for Summary and History --- */
+
+/* Final XP summary on the main results screen (Quiz Complete!) */
+.final-xp-summary {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 20px;
+    color: var(--color-text-main); /* Base color, ensure this variable is defined or replace with a static color */
+}
+
+/* XP display in individual question summary (per question) */
+.summary-xp {
+    font-size: 0.95em; /* Slightly larger than 0.9em for better readability */
+    font-weight: 600;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255, 255, 255, 0.7); /* Default subtle color */
+}
+
+.xp-gained {
+    color: #4CAF50; /* Green for positive XP */
+    text-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Subtle glow */
+}
+
+.xp-deducted {
+    color: #F44336; /* Red for negative XP */
+    text-shadow: 0 0 5px rgba(244, 67, 54, 0.5); /* Subtle glow */
+}
+
+/* XP display in overall quiz summary and history list items (total XP) */
+.summary-total-xp, .history-item p strong + span.xp-gained-summary, .history-item p strong + span.xp-deducted-summary {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    color: #e0e0ff; /* Base color, ensure this variable is defined or replace with a static color */
+}
+
+.xp-gained-summary {
+    color: #00E676; /* Brighter green for total positive XP */
+    text-shadow: 0 0 8px rgba(0, 230, 118, 0.7); /* Stronger glow */
+}
+
+.xp-deducted-summary {
+    color: #FF1744; /* Brighter red for total negative XP */
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.7); /* Stronger glow */
+}
+
+/* Enhancements for correct/wrong answers in the detailed summary */
+.summary-question-item.correct {
+    border-left: 5px solid #00E676; /* Green border for correct answers */
+    background-color: rgba(0, 230, 118, 0.05); /* Very light green background overlay */
+}
+
+.summary-question-item.wrong {
+    border-left: 5px solid #FF1744; /* Red border for wrong answers */
+    background-color: rgba(255, 255, 255, 0.05); /* Light transparent background (can also use rgba(255, 23, 68, 0.05) for a reddish hue) */
+}
+
+.summary-your-answer .correct-answer {
+    color: #00E676;
+    font-weight: 700;
+}
+
+.summary-your-answer .wrong-answer {
+    color: #FF1744;
+    font-weight: 700;
+    text-decoration: line-through; /* Strikethrough for wrong answer */
+}
+
+.summary-correct-answer span {
+    color: #00E676;
+    font-weight: 700;
+}
+
+/* Adjust padding/margins for better visual spacing in summary panels */
+.quiz-summary-panel .summary-details .summary-question-item {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05); /* Consistent glass background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quiz-history-panel .history-item {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08); /* Slightly more opaque for history items */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: left; /* Ensure text alignment for history list */
+}
+
+.quiz-history-panel .history-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.history-item p {
+    margin-bottom: 5px; /* Spacing for text in history items */
+}
+
+.history-item button {
+    margin-top: 10px;
+    margin-right: 10px; /* Space between buttons in history item */
+}
+
+/* General button styling adjustments for quiz setup/results/history - consistency */
+/* Ensure these align with your existing button styles, if different, adjust as needed */
+.quiz-content button {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 5px; /* Added margin for spacing between buttons */
+}
+
+.quiz-content button:hover {
+    background-position: right center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.quiz-content button:disabled {
+    background: #444;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.start-button {
+    background-image: linear-gradient(to right, #4CAF50 0%, #8BC34A  51%, #4CAF50  100%);
+}
+.view-history-button, .view-summary-button, .replay-button {
+    background-image: linear-gradient(to right, #2196F3 0%, #03A9F4  51%, #2196F3  100%);
+}
+.back-button, .restart-button {
+    background-image: linear-gradient(to right, #FF9800 0%, #FFC107  51%, #FF9800  100%);
+}
+.next-button {
+    background-image: linear-gradient(to right, #9C27B0 0%, #673AB7  51%, #9C27B0  100%);
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    transform: scale(0);
+    opacity: 0;
+    z-index: -1;
+}
+
+.quiz-content button:hover .button-glow {
+    transform: scale(1.5);
+    opacity: 1;
+}
+
+.button-text {
+    position: relative;
+    z-index: 2;
+}
+
+/* Styling for loading spinner (if not already present) */
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-panel p {
+    font-size: 1.2rem;
+    color: #e0e0ff;
+}
+
+/* Adjustments for better mobile responsiveness */
+@media (max-width: 768px) {
+    .quiz-content button {
+        width: 100%;
+        margin-bottom: 10px; /* Stack buttons vertically */
+    }
+    .difficulty-buttons button {
+        width: calc(33% - 10px); /* Adjust for 3 buttons in a row with margin */
+        margin-bottom: 0; /* Remove bottom margin if they are side-by-side */
+    }
+    .difficulty-buttons {
+        flex-wrap: wrap; /* Allow buttons to wrap to next line */
+        justify-content: center;
+        gap: 10px; /* Space between wrapped buttons */
+    }
+    /* You may need to further adjust specific panel paddings or font sizes for smaller screens */
+    .results-panel, .quiz-summary-panel, .quiz-history-panel {
+        padding: 20px;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+}
+

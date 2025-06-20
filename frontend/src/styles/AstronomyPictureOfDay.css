@@ -11,7 +11,10 @@
     justify-content: flex-start; /* Align content from the top */
     align-items: center;
     overflow: hidden;
-    background: linear-gradient(135deg, #0c0118, #1a0b2e, #0c0118);
+    background-image: url('../assets/LearnBG.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     font-family: 'Rajdhani', sans-serif;
     color: #e0e6ff;
     padding: 2rem 1rem;

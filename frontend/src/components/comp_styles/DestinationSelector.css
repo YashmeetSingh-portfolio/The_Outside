@@ -1,0 +1,144 @@
+.destination-container {
+    position: relative;
+    padding: 4rem 2rem;
+    background-image: url("../../assets/cockpit.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    text-align: center;
+    color: #b2faff;
+    font-family: 'Orbitron', sans-serif;
+    overflow: hidden;
+}
+
+.destination-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6); /* Darker overlay for better contrast */
+    z-index: 0;
+}
+
+.destination-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.destination-heading {
+    position: relative;
+    font-size: 2.2rem;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(to right, #00ffff, #0088ff);
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 10px #00fff5;
+    z-index: 1;
+}
+
+.destination-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.destination-card {
+    background: rgba(0, 0, 0, 0.3); /* Darker background for better readability */
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(6px); /* Adds glass effect like dashboard */
+}
+
+.destination-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.4); /* Slightly lighter on hover */
+}
+
+.destination-card.selected {
+    background: rgba(0, 255, 255, 0.15);
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+.destination-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+}
+
+.destination-card p {
+    font-size: 0.95rem;
+    color: #d0faff;
+    text-shadow: 0 0 3px rgba(0, 255, 255, 0.2);
+}
+
+.teleport-button {
+    position: relative;
+    z-index: 1;
+    margin-top: 3rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    background-color: #00ffff;
+    color: #000;
+    border: none;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.teleport-button:disabled {
+    background-color: #144b4e;
+    color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.teleport-button:hover:not(:disabled) {
+    background-color: #00bbff;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+/* Add the scanline overlay effect from dashboard */
+.destination-overlay {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+            0deg,
+            rgba(0, 255, 255, 0.03),
+            rgba(0, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 2px
+    );
+    z-index: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .destination-container {
+        padding: 3rem 1rem;
+    }
+
+    .destination-heading {
+        font-size: 1.8rem;
+    }
+
+    .destination-grid {
+        grid-template-columns: 1fr;
+    }
+}

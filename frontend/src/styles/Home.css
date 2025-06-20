@@ -1,0 +1,12 @@
+/* src/components/comp_styles/Home.css */
+
+.home-scroll-container {
+    width: 100%;
+    height: 100vh; /* This container fills the viewport */
+    overflow-y: scroll; /* Allows vertical scrolling */
+    scroll-snap-type: y mandatory; /* Enable mandatory vertical scroll snapping */
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    position: relative; /* Needed for stacking context if Navbar is fixed */
+    /* Add a background if you want a global one for Home, though sections will cover it */
+    background-color: #0b0c27; /* Deep space background */
+}

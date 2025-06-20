@@ -54,7 +54,8 @@ coverage/
 
 # Production
 /client/.env.production.local
-
+# Firebase Admin SDK private key
+backend/firebase-admin-sdk.json
 # Debug
 /client/npm-debug.log*
 /client/yarn-debug.log*

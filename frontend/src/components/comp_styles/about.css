@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+    --color-accent-blue: #60a5fa;
+    --color-text-main: #e0e0ff;
+    --glow-light: 0 0 10px rgba(136, 200, 255, 0.3);
+    --glow-strong: 0 0 15px rgba(136, 200, 255, 0.5);
+}
+
+.about-container {
+    position: sticky;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Exo', sans-serif;
+    color: white;
+    background-image: url('../../assets/about.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.about-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 0;
+}
+
+.about-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+.about-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    background: linear-gradient(to right, #ffffff, #88c8ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: var(--glow-light);
+    margin-bottom: 0.5rem;
+}
+
+.about-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    color: var(--color-text-main);
+    margin-bottom: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    justify-items: center;
+    align-items: stretch;
+}
+
+.about-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: left;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    width: 80%;
+}
+
+.about-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.card-heading {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.card-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-text-main);
+}
+
+.offer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.offer-list li {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.bullet-icon {
+    font-size: 1.2rem;
+    color: var(--color-accent-blue);
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+    .about-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .about-card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-container {
+        height: auto;
+        padding: 4rem 1.5rem;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .about-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: left;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        width: 100%; /* full width inside grid item */
+        max-width: 500px; /* avoid stretching too wide */
+        margin: 0 auto; /* center the card */
+    }
+
+
+    .about-title {
+        font-size: 1.8rem;
+    }
+
+    .about-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-heading {
+        font-size: 1.2rem;
+    }
+
+    .card-description,
+    .offer-list li {
+        font-size: 0.9rem;
+    }
+}
