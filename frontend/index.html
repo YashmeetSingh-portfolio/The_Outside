@@ -5,18 +5,32 @@
     <link rel="icon" type="image/svg+xml" href="/Logo.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <script type="text/javascript">
-       
         (function(l) {
-          if (l.search[1] === '/' ) {
-            var decoded = l.search.slice(1).split('&').map(function(s) {
-              return s.replace(/~and~/g, '&')
-            }).join('?');
-            window.history.replaceState(null, null,
-                l.pathname.slice(0, -1) + decoded + l.hash
-            );
-          }
+            // Check if the search string starts with "/?" which indicates an encoded path from the 404 fallback
+            if (l.search.startsWith('?/')) { // Changed from l.search[1] === '/' to startsWith('?/'). This is more robust.
+                var decodedPathAndSearch = l.search.slice(2); // Remove the initial '?/'
+
+                // Split by '&' if there are multiple segments (original path + original search params)
+                // Decode ~and~ back to &
+                var parts = decodedPathAndSearch.split('&').map(function(s) {
+                    return s.replace(/~and~/g, '&');
+                });
+
+                // The first part is the original path. Subsequent parts are original search params.
+                var originalPath = parts[0];
+                var originalSearchParams = parts.slice(1).join('&');
+
+                // Reconstruct the full path for history.replaceState
+                var newPath = '/' + originalPath; // Add leading slash for the path
+                if (originalSearchParams) {
+                    newPath += '?' + originalSearchParams; // Add original search params back
+                }
+                newPath += l.hash; // Preserve hash
+
+                window.history.replaceState(null, null, newPath);
+            }
         }(window.location))
-      </script>
+    </script>
     <title>The Outside</title>
 </head>
 <body>

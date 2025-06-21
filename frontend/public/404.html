@@ -4,18 +4,38 @@
     <meta charset="utf-8">
     <title>The Outside</title>
     <script type="text/javascript">
-
-      var pathSegmentsToKeep = 1;
+      // This script ensures that client-side routing works correctly after a direct server request
+      // (e.g., refresh or direct link to a sub-path).
+      // It redirects non-existent paths to the root with the intended path encoded.
 
       var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+      var path = l.pathname.slice(1); // Get path without leading slash
+      var search = l.search.slice(1); // Get search without leading question mark
 
+      // If the URL already contains the encoded path from a previous 404 redirect,
+      // we don't need to re-encode it. This prevents the infinite 'and' loop.
+      if (path.startsWith('?/')) {
+        // Already processed, so just ensure it's pointing to the root index.
+        // This scenario is less likely if the initial index.html script correctly handles it,
+        // but it's a safety net.
+        console.log("Path already encoded, redirecting without re-encoding.");
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          '/' + l.hash // Redirect to root, keeping hash if any
+        );
+      } else {
+        // Encode the full original path and search query to be appended after the base URL.
+        // We'll replace '&' with '~and~' to avoid conflict with query parameters.
+        var encodedPathAndSearch =
+            path.replace(/&/g, '~and~') +
+            (search ? '&' + search.replace(/&/g, '~and~') : '');
+
+        // Construct the new URL: base URL + '/?/' + encoded path + hash
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          '/?/' + encodedPathAndSearch + l.hash
+        );
+      }
     </script>
   </head>
   <body>
